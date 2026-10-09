@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block titulo %}Pedido #{{ pedido.id }}{% endblock %}
+
+{% block contenido %}
+<div class="cabecera-seccion">
+    <h1>Pedido #{{ pedido.id }}</h1>
+    <a class="boton secundario" href="{{ url_for('pedidos') }}">Volver</a>
+</div>
+
+<section class="panel">
+    <div class="resumen">
+        <p><strong>Usuario:</strong> {{ pedido.usuario.nombre }} ({{ pedido.usuario.email }})</p>
+        <p><strong>Fecha:</strong> {{ pedido.fecha.strftime('%Y-%m-%d %H:%M') }}</p>
+        <p><strong>Estado:</strong> <span class="estado {{ pedido.estado|lower }}">{{ pedido.estado }}</span></p>
+        <p><strong>Total:</strong> ${{ "%.2f"|format(pedido.total) }}</p>
+    </div>
+
+    <table>
+        <thead>
+            <tr><th>Producto</th><th>Precio unitario</th><th>Cantidad</th><th>Subtotal</th></tr>
+        </thead>
+        <tbody>
+            {% for item in pedido.items %}
+            <tr>
+                <td>{{ item.producto.nombre }}</td>
+                <td>${{ "%.2f"|format(item.precio_unitario) }}</td>
+                <td>{{ item.cantidad }}</td>
+                <td>${{ "%.2f"|format(item.subtotal()) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+
+<div class="columnas">
+    <section class="panel">
+        {# ---------- NUEVO: Mercado Pago ---------- #}
+        <h2>Pagar con Mercado Pago</h2>
+        {% if pedido.estado == 'Pagado' %}
+            <p class="vacio">Este pedido ya fue pagado.</p>
+        {% elif pedido.estado == 'Cancelado' %}
+            <p class="vacio">Este pedido fue cancelado y no se puede pagar.</p>
+        {% else %}
+            <p>Serás redirigido a Mercado Pago para completar el pago de
+               <strong>${{ "%.2f"|format(pedido.total) }}</strong>.</p>
+            <form method="post" action="{{ url_for('pedido_mercadopago', pedido_id=pedido.id) }}">
+                {{ delete_form.hidden_tag() }}
+                <button class="boton" type="submit">Pagar con Mercado Pago</button>
+            </form>
+        {% endif %}
+
+        <hr>
+
+        <h2>Simular cobro</h2>
+        {% if pedido.estado == 'Pagado' %}
+            <p class="vacio">Este pedido ya fue pagado.</p>
+        {% elif pedido.estado == 'Cancelado' %}
+            <p class="vacio">Este pedido fue cancelado.</p>
+        {% else %}
+        <form method="post" action="{{ url_for('pedido_pagar', pedido_id=pedido.id) }}" class="formulario">
+            {{ pago_form.hidden_tag() }}
+            <div class="campo">
+                {{ pago_form.metodo.label }}
+                {{ pago_form.metodo(class="entrada") }}
+            </div>
+            <div class="campo">
+                {{ pago_form.monto.label }}
+                {{ pago_form.monto(class="entrada", step="0.01") }}
+                {% for error in pago_form.monto.errors %}<span class="error">{{ error }}</span>{% endfor %}
+            </div>
+            <div class="campo">
+                {{ pago_form.resultado.label }}
+                {{ pago_form.resultado(class="entrada") }}
+            </div>
+            {{ pago_form.submit(class="boton", value="Procesar pago") }}
+        </form>
+        {% endif %}
+    </section>
+
+    <section class="panel">
+        <h2>Historial de pagos</h2>
+        {% if pedido.pagos %}
+        <table>
+            <thead><tr><th>Método</th><th>Monto</th><th>Estado</th><th>Referencia</th></tr></thead>
+            <tbody>
+                {% for pago in pedido.pagos %}
+                <tr>
+                    <td>{{ pago.metodo }}</td>
+                    <td>${{ "%.2f"|format(pago.monto) }}</td>
+                    <td><span class="estado {{ pago.estado|lower }}">{{ pago.estado }}</span></td>
+                    <td><code>{{ pago.referencia }}</code></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+            <p class="vacio">Sin pagos registrados.</p>
+        {% endif %}
+
+        <div class="acciones-rapidas">
+            {% if pedido.estado not in ['Pagado', 'Cancelado'] %}
+            <form method="post" action="{{ url_for('pedido_cancelar', pedido_id=pedido.id) }}"
+                  onsubmit="return confirm('¿Cancelar el pedido y restaurar el stock?');">
+                {{ delete_form.hidden_tag() }}
+                <button class="boton aviso" type="submit">Cancelar pedido</button>
+            </form>
+            {% endif %}
+            <form method="post" action="{{ url_for('pedido_eliminar', pedido_id=pedido.id) }}"
+                  onsubmit="return confirm('¿Eliminar definitivamente el pedido?');">
+                {{ delete_form.hidden_tag() }}
+                <button class="boton peligro" type="submit">Eliminar pedido</button>
+            </form>
+        </div>
+    </section>
+</div>
+{% endblock %}

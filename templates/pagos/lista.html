@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block titulo %}Pagos{% endblock %}
+
+{% block contenido %}
+<h1>Pagos registrados</h1>
+
+<section class="panel">
+    {% if pagos %}
+    <table>
+        <thead>
+            <tr><th>#</th><th>Pedido</th><th>Método</th><th>Monto</th><th>Estado</th><th>Referencia</th><th>Fecha</th></tr>
+        </thead>
+        <tbody>
+            {% for pago in pagos %}
+            <tr>
+                <td>{{ pago.id }}</td>
+                <td><a class="enlace" href="{{ url_for('pedido_detalle', pedido_id=pago.pedido_id) }}">#{{ pago.pedido_id }}</a></td>
+                <td>{{ pago.metodo }}</td>
+                <td>${{ "%.2f"|format(pago.monto) }}</td>
+                <td><span class="estado {{ pago.estado|lower }}">{{ pago.estado }}</span></td>
+                <td><code>{{ pago.referencia }}</code></td>
+                <td>{{ pago.fecha.strftime('%Y-%m-%d %H:%M') }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p class="vacio">Aún no se han procesado pagos.</p>
+    {% endif %}
+</section>
+{% endblock %}

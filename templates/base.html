@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block titulo %}Simulador de Pagos{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header class="barra">
+        <div class="contenedor barra-contenido">
+            <a class="marca" href="{{ url_for('inicio') }}"> Simulador de Pagos</a>
+            <nav class="nav">
+                <a href="{{ url_for('inicio') }}">Inicio</a>
+                <a href="{{ url_for('productos') }}">Productos</a>
+                <a href="{{ url_for('pedidos') }}">Pedidos</a>
+                <a href="{{ url_for('pagos') }}">Pagos</a>
+                <a href="{{ url_for('usuarios') }}">Usuarios</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="contenedor">
+        {% with mensajes = get_flashed_messages(with_categories=true) %}
+            {% if mensajes %}
+                <div class="mensajes">
+                    {% for categoria, mensaje in mensajes %}
+                        <div class="alerta {{ categoria }}">{{ mensaje }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block contenido %}{% endblock %}
+    </main>
+
+    <footer class="pie">
+        <div class="contenedor"></div>
+    </footer>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

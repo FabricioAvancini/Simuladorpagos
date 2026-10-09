@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block titulo %}{{ titulo }}{% endblock %}
+
+{% block contenido %}
+<div class="cabecera-seccion">
+    <h1>{{ titulo }}</h1>
+    <a class="boton secundario" href="{{ url_for('productos') }}">Volver</a>
+</div>
+
+<section class="panel formulario">
+    <form method="post">
+        {{ form.hidden_tag() }}
+
+        <div class="campo">
+            {{ form.nombre.label }}
+            {{ form.nombre(class="entrada") }}
+            {% for error in form.nombre.errors %}<span class="error">{{ error }}</span>{% endfor %}
+        </div>
+
+        <div class="campo">
+            {{ form.descripcion.label }}
+            {{ form.descripcion(class="entrada") }}
+        </div>
+
+        <div class="fila">
+            <div class="campo">
+                {{ form.precio.label }}
+                {{ form.precio(class="entrada", step="0.01") }}
+                {% for error in form.precio.errors %}<span class="error">{{ error }}</span>{% endfor %}
+            </div>
+            <div class="campo">
+                {{ form.stock.label }}
+                {{ form.stock(class="entrada") }}
+                {% for error in form.stock.errors %}<span class="error">{{ error }}</span>{% endfor %}
+            </div>
+        </div>
+
+        {{ form.submit(class="boton") }}
+    </form>
+</section>
+{% endblock %}

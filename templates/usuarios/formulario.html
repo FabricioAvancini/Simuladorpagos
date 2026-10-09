@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block titulo %}{{ titulo }}{% endblock %}
+
+{% block contenido %}
+<div class="cabecera-seccion">
+    <h1>{{ titulo }}</h1>
+    <a class="boton secundario" href="{{ url_for('usuarios') }}">Volver</a>
+</div>
+
+<section class="panel formulario">
+    <form method="post">
+        {{ form.hidden_tag() }}
+
+        <div class="campo">
+            {{ form.nombre.label }}
+            {{ form.nombre(class="entrada") }}
+            {% for error in form.nombre.errors %}<span class="error">{{ error }}</span>{% endfor %}
+        </div>
+
+        <div class="campo">
+            {{ form.email.label }}
+            {{ form.email(class="entrada") }}
+            {% for error in form.email.errors %}<span class="error">{{ error }}</span>{% endfor %}
+        </div>
+
+        <div class="campo">
+            {{ form.password.label }}
+            {{ form.password(class="entrada") }}
+            {% for error in form.password.errors %}<span class="error">{{ error }}</span>{% endfor %}
+        </div>
+
+        {{ form.submit(class="boton") }}
+    </form>
+</section>
+{% endblock %}

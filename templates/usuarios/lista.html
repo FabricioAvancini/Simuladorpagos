@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block titulo %}Usuarios{% endblock %}
+
+{% block contenido %}
+<div class="cabecera-seccion">
+    <h1>Usuarios</h1>
+    <a class="boton" href="{{ url_for('usuario_nuevo') }}">+ Nuevo usuario</a>
+</div>
+
+<section class="panel">
+    {% if usuarios %}
+    <table>
+        <thead>
+            <tr><th>#</th><th>Nombre</th><th>Email</th><th>Pedidos</th><th>Acciones</th></tr>
+        </thead>
+        <tbody>
+            {% for u in usuarios %}
+            <tr>
+                <td>{{ u.id }}</td>
+                <td>{{ u.nombre }}</td>
+                <td>{{ u.email }}</td>
+                <td>{{ u.pedidos|length }}</td>
+                <td class="acciones">
+                    <form method="post" action="{{ url_for('usuario_eliminar', usuario_id=u.id) }}"
+                          onsubmit="return confirm('¿Eliminar al usuario {{ u.nombre }} y todos sus pedidos?');">
+                        {{ delete_form.hidden_tag() }}
+                        <button class="enlace peligro" type="submit">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p class="vacio">No hay usuarios registrados.</p>
+    {% endif %}
+</section>
+{% endblock %}

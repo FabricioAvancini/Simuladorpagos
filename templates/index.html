@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block titulo %}Inicio · Simulador de Pagos{% endblock %}
+
+{% block contenido %}
+<h1>Panel general</h1>
+
+<section class="tarjetas">
+    <div class="tarjeta"><span class="numero">{{ usuarios }}</span><span class="etiqueta">Usuarios</span></div>
+    <div class="tarjeta"><span class="numero">{{ productos }}</span><span class="etiqueta">Productos</span></div>
+    <div class="tarjeta"><span class="numero">{{ pedidos }}</span><span class="etiqueta">Pedidos</span></div>
+    <div class="tarjeta"><span class="numero">{{ pagos }}</span><span class="etiqueta">Pagos</span></div>
+    <div class="tarjeta destacada"><span class="numero">${{ "%.2f"|format(ingresos) }}</span><span class="etiqueta">Cobrado</span></div>
+</section>
+
+<div class="acciones-rapidas">
+    <a class="boton" href="{{ url_for('pedido_nuevo') }}">+ Nuevo pedido</a>
+    <a class="boton secundario" href="{{ url_for('producto_nuevo') }}">+ Nuevo producto</a>
+    <a class="boton secundario" href="{{ url_for('usuario_nuevo') }}">+ Nuevo usuario</a>
+</div>
+
+<h2>Últimos pedidos</h2>
+<section class="panel">
+    {% if ultimos_pedidos %}
+    <table>
+        <thead>
+            <tr><th>#</th><th>Usuario</th><th>Total</th><th>Estado</th><th></th></tr>
+        </thead>
+        <tbody>
+            {% for pedido in ultimos_pedidos %}
+            <tr>
+                <td>{{ pedido.id }}</td>
+                <td>{{ pedido.usuario.nombre }}</td>
+                <td>${{ "%.2f"|format(pedido.total) }}</td>
+                <td><span class="estado {{ pedido.estado|lower }}">{{ pedido.estado }}</span></td>
+                <td><a href="{{ url_for('pedido_detalle', pedido_id=pedido.id) }}">Ver</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p class="vacio">Todavía no hay pedidos registrados.</p>
+    {% endif %}
+</section>
+{% endblock %}

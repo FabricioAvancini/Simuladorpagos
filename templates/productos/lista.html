@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block titulo %}Productos{% endblock %}
+
+{% block contenido %}
+<div class="cabecera-seccion">
+    <h1>Productos</h1>
+    <a class="boton" href="{{ url_for('producto_nuevo') }}">+ Nuevo producto</a>
+</div>
+
+<section class="panel">
+    {% if productos %}
+    <table>
+        <thead>
+            <tr><th>#</th><th>Nombre</th><th>Descripción</th><th>Precio</th><th>Stock</th><th>Acciones</th></tr>
+        </thead>
+        <tbody>
+            {% for p in productos %}
+            <tr>
+                <td>{{ p.id }}</td>
+                <td>{{ p.nombre }}</td>
+                <td>{{ p.descripcion or '—' }}</td>
+                <td>${{ "%.2f"|format(p.precio) }}</td>
+                <td>{{ p.stock }}</td>
+                <td class="acciones">
+                    <a class="enlace" href="{{ url_for('producto_editar', producto_id=p.id) }}">Editar</a>
+                    <form method="post" action="{{ url_for('producto_eliminar', producto_id=p.id) }}"
+                          onsubmit="return confirm('¿Eliminar el producto {{ p.nombre }}?');">
+                        {{ delete_form.hidden_tag() }}
+                        <button class="enlace peligro" type="submit">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p class="vacio">No hay productos. Crea el primero.</p>
+    {% endif %}
+</section>
+{% endblock %}

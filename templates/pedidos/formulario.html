@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block titulo %}Nuevo pedido{% endblock %}
+
+{% block contenido %}
+<div class="cabecera-seccion">
+    <h1>Nuevo pedido</h1>
+    <a class="boton secundario" href="{{ url_for('pedidos') }}">Volver</a>
+</div>
+
+<section class="panel formulario">
+    <form method="post">
+        {{ form.hidden_tag() }}
+
+        <div class="campo">
+            {{ form.usuario_id.label }}
+            {{ form.usuario_id(class="entrada") }}
+            {% for error in form.usuario_id.errors %}<span class="error">{{ error }}</span>{% endfor %}
+        </div>
+
+        <h3>Productos del pedido</h3>
+        <div id="items">
+            {% for item in form.items %}
+            <div class="fila item-pedido">
+                <div class="campo crecer">
+                    {{ item.producto_id.label }}
+                    {{ item.producto_id(class="entrada") }}
+                </div>
+                <div class="campo corto">
+                    {{ item.cantidad.label }}
+                    {{ item.cantidad(class="entrada", min="1") }}
+                </div>
+                <button type="button" class="enlace peligro quitar" title="Quitar">✕</button>
+            </div>
+            {% endfor %}
+        </div>
+
+        <button type="button" id="agregar" class="boton secundario">+ Agregar producto</button>
+
+        <div class="pie-formulario">
+            {{ form.submit(class="boton") }}
+        </div>
+    </form>
+</section>
+
+<template id="plantilla-item">
+    <div class="fila item-pedido">
+        <div class="campo crecer">
+            <label>Producto</label>
+            <select class="entrada" name="items-__INDEX__-producto_id">
+                {% for valor, texto in form.items[0].producto_id.choices %}
+                <option value="{{ valor }}">{{ texto }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="campo corto">
+            <label>Cantidad</label>
+            <input class="entrada" type="number" min="1" name="items-__INDEX__-cantidad" value="1">
+        </div>
+        <button type="button" class="enlace peligro quitar" title="Quitar">✕</button>
+    </div>
+</template>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const contenedor = document.getElementById('items');
+    const plantilla = document.getElementById('plantilla-item');
+    let contador = contenedor.querySelectorAll('.item-pedido').length;
+
+    document.getElementById('agregar').addEventListener('click', function () {
+        const html = plantilla.innerHTML.replace(/__INDEX__/g, contador);
+        contenedor.insertAdjacentHTML('beforeend', html);
+        contador += 1;
+    });
+
+    contenedor.addEventListener('click', function (evento) {
+        if (evento.target.classList.contains('quitar')) {
+            const filas = contenedor.querySelectorAll('.item-pedido');
+            if (filas.length > 1) {
+                evento.target.closest('.item-pedido').remove();
+            }
+        }
+    });
+</script>
+{% endblock %}
